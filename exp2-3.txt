@@ -1,0 +1,45 @@
+- create 2 buckets
+- first bucket: store-artifacts (default settings)
+- second bucket: deployment (uncheck public)
+- go to codebuild
+- give project name
+- public repository - https://github.com/iamdkcoder/Car-pwa-deploy-on-aws
+- check -> use a buildspec file
+- create
+- go to codepipeline
+- choose custom option
+- give pipeline name
+- advanced settings -> custom location -> store-artifacts (s3)
+- source stage -> amazon s3
+- connect to GitHub -> choose repo and branch
+- build stage -> build provider -> codebuild -> projectname
+- deploy stage -> aws s3 -> deployment bucket -> check the extract file before deploy box
+- create
+- build will fail once
+- click on codebuild
+- find service role in environment and click on it
+- add s3 permission on it
+- retry build
+- open the deployment s3 bucket
+- properties -> enable static site hosting
+- index document -> index.html
+- save
+- permissions tab 
+- paste this policy: 
+{
+    "Version": "2012-10-17",		 	 	 
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::Bucket-Name/*"
+            ]
+        }
+    ]
+}
+- save changes
