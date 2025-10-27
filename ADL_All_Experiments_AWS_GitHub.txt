@@ -1,0 +1,156 @@
+ADVANCED DEVOPS LAB (ADL) – ALL AWS EXPERIMENTS WITH GITHUB (EXAM READY)
+---------------------------------------------------------------
+Author: ChatGPT (GPT-5)
+Version: October 2025
+
+EXPERIMENT 1: Getting Started with AWS Console
+----------------------------------------------
+Aim: Explore AWS Management Console and core services.
+Steps:
+1. Login to https://aws.amazon.com/console
+2. Choose Region: Asia Pacific (Mumbai).
+3. Explore EC2, S3, IAM, Lambda.
+4. Launch a t2.micro EC2, create S3 bucket, IAM user.
+5. Stop/Terminate instance. Record findings.
+
+EXPERIMENT 2: CI/CD with CodePipeline + Elastic Beanstalk + GitHub
+------------------------------------------------------------------
+Code (Node.js):
+app.js:
+const http = require('http');
+const server = http.createServer((req,res)=>{res.end('Hello from EB via CodePipeline!');});
+server.listen(process.env.PORT || 8080);
+
+package.json:
+{"name":"eb-sample","version":"1.0.0","main":"app.js","scripts":{"start":"node app.js"}}
+
+AWS Steps:
+1. Create GitHub repo, push above code.
+2. Elastic Beanstalk -> Create Application -> Node.js -> Upload code -> Create environment.
+3. CodePipeline -> Create Pipeline -> Source: GitHub, Deploy: Elastic Beanstalk.
+4. Release change, verify URL.
+5. Push new commit -> auto deploys.
+
+EXPERIMENT 3: Static Website on S3
+----------------------------------
+1. Prepare HTML site -> push to GitHub.
+2. AWS S3 -> Create Bucket (disable Block All Public Access).
+3. Upload files -> Properties -> Enable Static Website Hosting.
+4. Index document: index.html.
+5. Open endpoint URL in browser.
+
+EXPERIMENT 4: Dynamic App on EC2 (GitHub)
+-----------------------------------------
+1. EC2 -> Launch Ubuntu t2.micro -> allow HTTP/SSH.
+2. SSH to instance -> install Apache: sudo apt update && sudo apt install apache2 -y
+3. git clone https://github.com/yourname/yourrepo.git /var/www/html
+4. Restart Apache -> open Public IP.
+
+EXPERIMENT 5: IAM Management
+-----------------------------
+1. IAM -> Create user (Programmatic + Console access).
+2. Attach AdministratorAccess policy.
+3. Create Group -> Add user.
+4. Create Role for EC2 -> attach AmazonS3FullAccess.
+5. Assign role to EC2, test S3 access.
+
+EXPERIMENT 6: Terraform Infrastructure (GitHub + AWS)
+------------------------------------------------------
+main.tf:
+terraform {
+  required_providers { aws = { source = "hashicorp/aws", version = "~> 5.0" } }
+}
+provider "aws" { region = var.region }
+resource "aws_instance" "vm" {
+  ami = var.ami_id
+  instance_type = var.instance_type
+  tags = { Name = "tf-ec2-demo" }
+}
+
+variables.tf:
+variable "region" { type = string }
+variable "ami_id" { type = string }
+variable "instance_type" { type = string  default = "t2.micro" }
+
+outputs.tf:
+output "instance_id" { value = aws_instance.vm.id }
+
+Steps:
+1. GitHub repo with above files.
+2. Terraform init, plan, apply.
+3. Verify EC2 instance.
+4. Modify instance_type -> reapply.
+5. terraform destroy.
+
+EXPERIMENT 7: RDS MySQL
+------------------------
+1. RDS -> Create Database -> MySQL -> Free Tier.
+2. Enable public access.
+3. Copy endpoint -> connect via mysql client:
+   mysql -h endpoint -u admin -p
+4. SQL:
+   CREATE DATABASE examdb;
+   USE examdb;
+   CREATE TABLE notes(id INT PRIMARY KEY, txt VARCHAR(100));
+   INSERT INTO notes VALUES (1,'RDS OK');
+   SELECT * FROM notes;
+5. Delete DB instance.
+
+EXPERIMENT 8: S3 Lifecycle
+---------------------------
+1. S3 -> Bucket -> Management -> Lifecycle Rules -> Create rule.
+2. Transition: Glacier after 30 days.
+3. Expire after 365 days.
+
+EXPERIMENT 9: Custom VPC
+------------------------
+1. VPC -> Create VPC (CIDR 10.0.0.0/16).
+2. Create Subnets: 10.0.1.0/24 (public), 10.0.2.0/24 (private).
+3. Create Internet Gateway -> Attach to VPC.
+4. Route 0.0.0.0/0 to IGW.
+5. Launch EC2 in public subnet -> test ping.
+
+EXPERIMENT 10: CloudWatch + SNS Alarm
+-------------------------------------
+1. CloudWatch -> Alarms -> Create alarm.
+2. Metric: EC2 CPUUtilization.
+3. Condition: >70% for 2 datapoints.
+4. Notification: SNS -> Email -> confirm.
+5. Trigger load -> check alarm.
+
+EXPERIMENT 11: S3 -> SNS Notification
+-------------------------------------
+1. SNS -> Create Topic -> Subscription (Email) -> confirm.
+2. S3 -> Properties -> Event notifications -> On object created -> send to SNS.
+3. Upload file -> check email.
+
+EXPERIMENT 12: Lambda + S3 Trigger (Python)
+-------------------------------------------
+Lambda code:
+import json
+def lambda_handler(event, context):
+    print("An image has been added")
+    return {"statusCode":200,"body":json.dumps("Logged")}
+
+Steps:
+1. Create S3 bucket.
+2. Create IAM role for Lambda (S3 + CloudWatch access).
+3. Lambda -> Create Function -> Python -> use role.
+4. Add trigger: S3 -> Object Created.
+5. Upload file -> verify CloudWatch log.
+
+---------------------------------------------------------------
+For GitHub submission:
+Folder structure:
+/Exp01-Intro
+/Exp02-CodePipeline
+/Exp03-S3Website
+/Exp04-EC2
+/Exp05-IAM
+/Exp06-Terraform
+/Exp07-RDS
+/Exp08-Lifecycle
+/Exp09-VPC
+/Exp10-CloudWatch
+/Exp11-SNS
+/Exp12-Lambda
